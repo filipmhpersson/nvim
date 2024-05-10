@@ -321,7 +321,7 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim [C]onfig' })
 
       vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = '~/notes' }
+        builtin.find_files { cwd = '~/personal/notes' }
       end, { desc = '[S]earch [N]otes' })
     end,
   },
