@@ -30,7 +30,7 @@ vim.opt.showmode = false
 --  See `:help 'clipboard'`
 vim.opt.clipboard = 'unnamedplus'
 -- Enable break indent
-vim.opt.breakindent = true
+--vim.opt.breakindent = true
 
 -- Save undo history
 vim.opt.undofile = true
@@ -80,6 +80,8 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+vim.keymap.set('x', '<leader>p', [["_dP]], { desc = '[P]aste and keep same text in copy buffer}' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -456,7 +458,7 @@ require('lazy').setup({
           -- This may be unwanted, since they displace some of your code
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+              vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
             end, '[T]oggle Inlay [H]ints')
           end
         end,
@@ -494,6 +496,13 @@ require('lazy').setup({
           handlers = {
             ['textDocument/definition'] = require('omnisharp_extended').handler,
           },
+          settings = {
+            RoslynExtensionOptions = {
+              inlayHintsOptions = {
+                enableForParameters = true,
+              },
+            },
+          },
           enable_roslyn_analysers = true,
           enable_import_completion = true,
           organize_imports_on_format = true,
@@ -521,7 +530,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
+        tsserver = {},
         --
 
         lua_ls = {
@@ -572,6 +581,13 @@ require('lazy').setup({
               capabilities = capabilities,
               handlers = {
                 ['textDocument/definition'] = require('omnisharp_extended').handler,
+              },
+              settings = {
+                RoslynExtensionOptions = {
+                  inlayHintsOptions = {
+                    enableForParameters = true,
+                  },
+                },
               },
               enable_roslyn_analysers = true,
               enable_import_completion = true,
@@ -797,7 +813,23 @@ require('lazy').setup({
   },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
+  {
+    'CopilotC-Nvim/CopilotChat.nvim',
+    branch = 'canary',
+    dependencies = {
+      { 'zbirenbaum/copilot.lua' }, -- or github/copilot.vim
+      { 'nvim-lua/plenary.nvim' }, -- for curl, log wrapper
+    },
+    opts = {
+      debug = true, -- Enable debugging
+      --
+      -- See Configuration section for rest
+    },
+    config = function()
+      require('CopilotChat').setup {}
+    end,
+    -- See Commands section for default commands if you want to lazy load on them
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -816,7 +848,7 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
+      -- Simple and easy statusline.:
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
