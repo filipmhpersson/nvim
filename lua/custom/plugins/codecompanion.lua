@@ -1,0 +1,34 @@
+return {
+  --  {
+  --    'olimorris/codecompanion.nvim',
+  --    event = 'VeryLazy',
+  --    config = function()
+  --      require('codecompanion').setup {
+  --        adapters = {
+  --          copilot = function()
+  --            return require('codecompanion.adapters').extend('copilot', {
+  --              schema = {
+  --                model = {
+  --                  default = 'claude-3.7-sonneta',
+  --                },
+  --              },
+  --            })
+  --          end,
+  --        },
+  --        strategies = {
+  --          chat = {
+  --            adapter = 'copilot',
+  --          },
+  --          inline = {
+  --            adapter = 'copilot',
+  --          },
+  --        },
+  --      }
+  --    end,
+  --
+  --    dependencies = {
+  --      'nvim-lua/plenary.nvim',
+  --      'nvim-treesitter/nvim-treesitter',
+  --    },
+  --  },
+}
