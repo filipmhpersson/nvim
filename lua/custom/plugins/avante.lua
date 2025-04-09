@@ -1,4 +1,4 @@
-return {
+if 1 == 1 then return {} else return {
   {
     'zbirenbaum/copilot.lua',
     cmd = 'Copilot',
@@ -79,3 +79,4 @@ return {
     },
   },
 }
+end

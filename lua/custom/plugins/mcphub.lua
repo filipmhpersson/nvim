@@ -1,4 +1,4 @@
-return {
+if 1 == 1 then return {} else return {
   'ravitemer/mcphub.nvim',
   dependencies = {
     'nvim-lua/plenary.nvim',
@@ -24,3 +24,4 @@ return {
     }
   end,
 }
+end
