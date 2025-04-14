@@ -5,12 +5,25 @@ return {
     config = function()
       require('codecompanion').setup {
         adapters = {
+
           copilot = function()
             return require('codecompanion.adapters').extend('copilot', {
               schema = {
                 model = {
                   default = 'claude-3.7-sonnet',
                 },
+              },
+            })
+          end,
+
+          azure_openai = function()
+            return require('codecompanion.adapters').extend('azure_openai', {
+              env = {
+                api_key = 'cmd: echo $AZURE_OPENAI_API_KEY',
+                endpoint = 'https://test-ibinder-ai-services.openai.azure.com/',
+              },
+              schema = {
+                model = {},
               },
             })
           end,
@@ -22,15 +35,9 @@ return {
           inline = {
             adapter = 'copilot',
           },
-          completion = {
-            adapter = 'copilot',
-            accept_keymaps = '<Tab>',
-            dismiss_keymaps = '<C-]>',
-          },
         },
       }
     end,
-
     dependencies = {
       'nvim-lua/plenary.nvim',
       'nvim-treesitter/nvim-treesitter',
