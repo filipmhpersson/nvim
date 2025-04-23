@@ -30,6 +30,9 @@ vim.opt.clipboard = 'unnamedplus'
 vim.opt.breakindent = false
 
 -- Save undo history
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -63,7 +66,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = {  trail = '·', nbsp = '␣' }
+vim.opt.listchars = { trail = '·', nbsp = '␣' }
 -- vim.opt.shiftwidth = 4
 -- vim.opt.tabstop = 4
 -- Preview substitutions live, as you type!
@@ -175,7 +178,7 @@ require('lazy').setup({
   --  config = function() ... end
 
   { -- Useful plugin to show you pending keybinds.
-  'folke/which-key.nvim',
+    'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     -- Document existing key chains
     opts = {
@@ -289,7 +292,11 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          colorscheme = {
+            enable_preview = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -425,6 +432,8 @@ require('lazy').setup({
             map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
             map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
           end
+          if client ~= nil and client.name == 'roslyn' then
+          end
 
           -- Find references for the word under your cursor.
 
@@ -544,7 +553,7 @@ require('lazy').setup({
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+      --  So, we create new capabilitdies with nvim cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Enable the following language servers
@@ -559,7 +568,6 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         gopls = {},
-        roslyn = {},
         -- pyright = {},
         rust_analyzer = {},
         zls = {
@@ -668,41 +676,49 @@ require('lazy').setup({
   },
   {
     'seblj/roslyn.nvim',
-    ft = 'cs',
-    opts = function()
-      return {
-        config = {
-          settings = {
-            ['csharp|background_analysis'] = {
-              dotnet_analyzer_diagnostics_scope = 'fullSolution',
-              dotnet_compiler_diagnostics_scope = 'fullSolution',
-            },
-            ['csharp|code_lens'] = {
-              dotnet_enable_references_code_lens = true,
-            },
-            ['csharp|completion'] = {
-              dotnet_show_name_completion_suggestions = true,
-              dotnet_show_completion_items_from_unimported_namespaces = true,
-              dotnet_provide_regex_completions = true,
-            },
-            ['csharp|inlay_hints'] = {
-              csharp_enable_inlay_hints_for_implicit_object_creation = true,
-              csharp_enable_inlay_hints_for_implicit_variable_types = true,
-              csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-              csharp_enable_inlay_hints_for_types = true,
-              dotnet_enable_inlay_hints_for_indexer_parameters = true,
-              dotnet_enable_inlay_hints_for_literal_parameters = true,
-              dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-              dotnet_enable_inlay_hints_for_other_parameters = true,
-              dotnet_enable_inlay_hints_for_parameters = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-            },
+    ft = { 'cs', 'csproj' },
+    ---@module 'roslyn.config'
+    ---@type RoslynNvimConfig
+    opts = {
+      config = {
+        broadSearch = true,
+        settings = {
+          --    ['csharp|background_analysis'] = {
+          --      dotnet_analyzer_diagnostics_scope = 'fullSolution',
+          --      dotnet_compiler_diagnostics_scope = 'fullSolution',
+          --    },
+          ['csharp|background_analysis'] = {
+            dotnet_analyzer_diagnostics_scope = 'FullSolution',
+            dotnet_compiler_diagnostics_scope = 'FullSolution',
+          },
+          ['csharp|symbol_search'] = {
+            dotnet_search_reference_assemblies = true,
+          },
+          ['csharp|code_lens'] = {
+            dotnet_enable_references_code_lens = true,
+          },
+          ['csharp|completion'] = {
+            dotnet_show_name_completion_suggestions = true,
+            dotnet_show_completion_items_from_unimported_namespaces = true,
+            dotnet_provide_regex_completions = true,
+          },
+          ['csharp|inlay_hints'] = {
+            csharp_enable_inlay_hints_for_implicit_object_creation = true,
+            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+            csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+            csharp_enable_inlay_hints_for_types = true,
+            dotnet_enable_inlay_hints_for_indexer_parameters = true,
+            dotnet_enable_inlay_hints_for_literal_parameters = true,
+            dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+            dotnet_enable_inlay_hints_for_other_parameters = true,
+            dotnet_enable_inlay_hints_for_parameters = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
           },
         },
-      }
-    end,
+      },
+    },
   },
   { -- Autocompletion
     'saghen/blink.cmp',
@@ -738,31 +754,22 @@ require('lazy').setup({
     --- @type blink.cmp.Config
     opts = {
       keymap = {
-        -- 'default' (recommended) for mappings similar to built-in completions
-        --   <c-y> to accept ([y]es) the completion.
-        --    This will auto-import if your LSP supports it.
-        --    This will expand snippets if the LSP sent a snippet.
-        -- 'super-tab' for tab to accept
-        -- 'enter' for enter to accept
-        -- 'none' for no mappings
-        --
-        -- For an understanding of why the 'default' preset is recommended,
-        -- you will need to read `:help ins-completion`
-        --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        --
-        -- All presets have the following mappings:
-        -- <tab>/<s-tab>: move to right/left of your snippet expansion
-        -- <c-space>: Open menu or open docs if already open
-        -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-        -- <c-e>: Hide menu
-        -- <c-k>: Toggle signature help
-        --
-        -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'none',
+        ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
+        ['<C-e>'] = { 'hide' },
+        ['<C-y>'] = { 'select_and_accept' },
 
-        -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        ['<Up>'] = { 'select_prev', 'fallback' },
+        ['<Down>'] = { 'select_next', 'fallback' },
+        ['<C-p>'] = { 'select_prev', 'fallback_to_mappings' },
+        ['<C-n>'] = { 'select_next', 'fallback_to_mappings' },
+
+        ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
+        ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+
+        ['<C-J>'] = { 'snippet_forward', 'fallback' },
+
+        ['<C-K>'] = { 'snippet_backward', 'show_signature', 'hide_signature', 'fallback' },
       },
 
       appearance = {
@@ -801,14 +808,13 @@ require('lazy').setup({
   },
   { 'rebelot/kanagawa.nvim' },
   { 'EdenEast/nightfox.nvim' },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
+  { 'projekt0n/github-nvim-theme' },
   {
     'folke/tokyonight.nvim',
     lazy = false,
     priority = 1000,
     opts = {},
-    config = function()
-      vim.cmd [[colorscheme tokyonight-moon]]
-    end,
   },
   { 'rose-pine/neovim', name = 'rose-pine', lazy = false, priority = 1000, opts = {} },
   --
@@ -955,5 +961,7 @@ require('lazy').setup({
     },
   },
 })
+
+require 'fchamp'
 
 -- The ,line beneath this is called `modeline`. See `:help modeline`
