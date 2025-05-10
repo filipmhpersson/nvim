@@ -32,7 +32,7 @@ vim.opt.breakindent = false
 -- Save undo history
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -573,6 +573,11 @@ require('lazy').setup({
         zls = {
           enable_build_on_save = true,
           build_on_save_step = 'check',
+          settings = {
+            enable_build_on_save = true,
+            build_on_save_step = 'check',
+            build_on_save_args = 'check',
+          },
         },
 
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -582,6 +587,7 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
+        tailwindcss = {},
         --
 
         lua_ls = {
@@ -676,6 +682,7 @@ require('lazy').setup({
   },
   {
     'seblj/roslyn.nvim',
+    branch = 'vim.lsp.config',
     ft = { 'cs', 'csproj' },
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
@@ -753,6 +760,7 @@ require('lazy').setup({
     --- @module 'blink.cmp'
     --- @type blink.cmp.Config
     opts = {
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
       keymap = {
         preset = 'none',
         ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
@@ -800,7 +808,6 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
@@ -869,7 +876,23 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'c_sharp', 'rust', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'zig', 'typespec' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'c_sharp',
+        'rust',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'diff',
+        'query',
+        'markdown_inline',
+        'vim',
+        'vimdoc',
+        'zig',
+        'typespec',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -881,21 +904,6 @@ require('lazy').setup({
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
-    config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-      -- Prefer git instead of curl in order to improve connectivity in some environments
-      require('nvim-treesitter.install').prefer_git = true
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
-
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-    end,
   },
   {
     'luckasRanarison/tailwind-tools.nvim',
