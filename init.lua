@@ -1,5 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.opt.guicursor = ''
 
 vim.o.termguicolors = true
 -- Set to true if you have a Nerd Font installed and selected in the terminal
@@ -25,15 +26,11 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.opt.clipboard = 'unnamedplus'
+--vim.opt.clipboard = 'unnamedplus'
 -- Enable break indent
 vim.opt.breakindent = false
 
 -- Save undo history
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
-vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
@@ -84,7 +81,8 @@ vim.opt.scrolloff = 10
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', function()
   return vim.diagnostic.jump { count = 1 }
@@ -96,6 +94,7 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagn
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 vim.keymap.set('x', '<leader>p', [["_dP]], { desc = '[P]aste and keep same text in copy buffer}' })
+vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -587,6 +586,9 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
+        prettier = {},
+        prettierd = {},
+        hls = {},
         tailwindcss = {},
         --
 
@@ -624,6 +626,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'prettier', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -637,6 +640,14 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+
+            -- Disable formatting capabilities for ts_ls
+            if server_name == 'ts_ls' then
+              server.capabilities.textDocument.formatting = false
+              server.capabilities.textDocument.rangeFormatting = false
+              server.capabilities.documentFormattingProvider = false
+            end
+
             require('lspconfig')[server_name].setup(server)
           end,
         },
@@ -659,16 +670,16 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      --format_on_save = function(bufnr)
-      --  -- Disable "format_on_save lsp_fallback" for languages that don't
-      --  -- have a well standardized coding style. You can add additional
-      --  -- languages here or re-enable it for the disabled ones.
-      --  local disable_filetypes = { c = true, cpp = true, rs = true }
-      --  return {
-      --    timeout_ms = 500,
-      --    lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-      --  }
-      --end,
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        local disable_filetypes = { c = true, cpp = true, rs = true }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
+      end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -676,7 +687,11 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        csharp = { 'csharpier' },
       },
     },
   },
@@ -969,7 +984,18 @@ require('lazy').setup({
     },
   },
 })
-
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = { '*.ts', '*.tsx', '*.js', '*.jsx' },
+  callback = function()
+    vim.lsp.buf.code_action {
+      apply = true,
+      context = {
+        only = { 'source.removeUnused.ts' },
+        diagnostics = {},
+      },
+    }
+  end,
+})
 require 'fchamp'
 
 -- The ,line beneath this is called `modeline`. See `:help modeline`

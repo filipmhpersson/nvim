@@ -1,12 +1,4 @@
-if 1 == 1 then return {} else return {
-  {
-    'zbirenbaum/copilot.lua',
-    cmd = 'Copilot',
-    event = 'InsertEnter',
-    config = function()
-      require('copilot').setup {}
-    end,
-  },
+return {
   {
     'yetone/avante.nvim',
     event = 'VeryLazy',
@@ -16,12 +8,12 @@ if 1 == 1 then return {} else return {
       -- for example
       provider = 'copilot',
       azure = {
-        endpoint = 'https://ibinder-ai-test.openai.azure.com/',
-        deployment = 'o3-mini',
-        model = 'o3-mini', -- your desired model (or use gpt-4o, etc.)
+        endpoint = 'https://test-ibinder-ai-services.openai.azure.com/',
+        deployment = 'gpt-4.1',
+        model = 'gpt-4.1', -- your desired model (or use gpt-4o, etc.)
         timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
         temperature = 0,
-        max_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+        max_tokens = 20000, -- Increase this to include reasoning tokens (for reasoning models)
         --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
       },
       copilot = {
@@ -32,7 +24,6 @@ if 1 == 1 then return {} else return {
         timeout = 30000, -- Timeout in milliseconds
         temperature = 0,
         max_tokens = 20480,
-        disable_tools = true,
       },
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
@@ -50,7 +41,6 @@ if 1 == 1 then return {} else return {
       'ibhagwan/fzf-lua', -- for file_selector provider fzf
       'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
       'zbirenbaum/copilot.lua', -- for providers='copilot'
-      'mcphub/mcphub.nvim', -- for providers='mcp_hub' - Model Context Protocol Hub
       {
         -- support for image pasting
         'HakonHarnes/img-clip.nvim',
@@ -79,4 +69,3 @@ if 1 == 1 then return {} else return {
     },
   },
 }
-end
