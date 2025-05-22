@@ -6,15 +6,16 @@ return {
     opts = {
       -- add any opts here
       -- for example
-      provider = 'copilot',
+      provider = 'azure',
       azure = {
         endpoint = 'https://test-ibinder-ai-services.openai.azure.com/',
         deployment = 'gpt-4.1',
+        api_version = '2024-12-01-preview',
         model = 'gpt-4.1', -- your desired model (or use gpt-4o, etc.)
         timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
         temperature = 0,
-        max_tokens = 20000, -- Increase this to include reasoning tokens (for reasoning models)
-        --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+        max_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+        reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
       },
       copilot = {
         endpoint = 'https://api.githubcopilot.com',
@@ -37,7 +38,6 @@ return {
       --- The below dependencies are optional,
       'echasnovski/mini.pick', -- for file_selector provider mini.pick
       'nvim-telescope/telescope.nvim', -- for file_selector provider telescope
-      'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
       'ibhagwan/fzf-lua', -- for file_selector provider fzf
       'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
       'zbirenbaum/copilot.lua', -- for providers='copilot'
